@@ -17,14 +17,14 @@
       </div>
       <img class=" absolute top-[18px] left-[70px] z-[2] rounded-full lg:mx-0 mx-auto" width="45"
         src="~/assets/images/tiktok-logo-small.png" alt="">
-      <video v-if="true" class=" absolute object-cover w-full my-auto z-[0] h-screen"
-        src="https://video.699pic.com/videos/50/19/54/b_3BMWZZSDmB1j1642501954.mp4"></video>
-      <div class="flex items-center justify-center bg-black bg-opacity-70 h-screen lg:min-w-[480px]:">
+      <video v-if="!isLoaded" class="display  absolute object-cover w-full my-auto z-[0] h-screen"
+        src="https://video.699pic.com/videos/13/50/40/b_QEu7qXbWj4rg1672135040.mp4"></video>
+      <div v-if="!isLoaded" class="flex items-center justify-center bg-black bg-opacity-70 h-screen lg:min-w-[480px]:">
         <Icon class=" animate-spin ml-1" name="mingcute:loading-line" size="100" color="#ffffff"></Icon>
       </div>
       <div class=" bg-black bg-opacity-70 lg:min-w-[480px]">
-        <video v-if="true" ref="video" loop muted class="h-screen"
-          src="https://video.699pic.com/videos/50/19/54/b_3BMWZZSDmB1j1642501954.mp4"></video>
+        <video ref="video" v-if="true" loop muted class="h-screen w-full"
+          src="https://video.699pic.com/videos/13/50/40/b_QEu7qXbWj4rg1672135040.mp4"></video>
       </div>
     </div>
     <div id="InfoSection" v-if="true" class=" lg:max-w-[550px]  relative w-full h-full bg-white">
@@ -92,10 +92,15 @@
         <div class="mb-28"></div>
         <div id="CreateComment" v-if="true"
           class=" absolute flex items-center justify-between bottom-0 bg-white h-[85px] lg:max-w-[550px] w-full py-5 px-8 border-t-2">
-          <div :class="inputFocuesd?'border-2 border-gray-400':'border-2 border-[#f1f1f2]'"
+          <div :class="inputFocused?'border-2 border-gray-400':'border-2 border-[#f1f1f2]'"
             class=" bg-[#f1f1f2] flex items-center rounded-lg w-full lg:max-w-[420px]">
-            <input type="text" name="" id="">
+            <input v-model="comment" @focus="$event=>inputFocused=true" @blur="inputFocused=false"
+              class="bg-[#f1f1f2] text-[14px] focus:outline-none w-full lg:max-w-[420px] p-2 rounded-lg" type="text"
+              placeholder="Add comment...">
           </div>
+          <button :disabled="!comment" @click="$event=>addComment()"
+            :class="comment?'text-[#f02c56] cursor-pointer':'text-gray-400'"
+            class=" font-semibold text-sm ml-5 pr-1">Post</button>
         </div>
       </div>
     </div>
@@ -103,5 +108,36 @@
 </template>
 
 <script setup>
-let inputFocuesd = ref(false)
+const route = useRoute()
+const router = useRouter()
+
+let video = ref(null)
+let isLoaded = ref(false)
+let comment = ref(null)
+let inputFocused = ref(false)
+watch(() => isLoaded.value, () => {
+  if (isLoaded.value) {
+    setTimeout(() => {
+      video.value.play()
+    }, 500);
+  }
+})
+onMounted(() => {
+  isLoaded.value = true
+  video.value.play()
+  // video.value.addEventListener('loadeddata', (e) => {
+  //   console.log(22, e);
+  //   if (e.target) {
+  //     console.log(33, e.target);
+  //     setTimeout(() => {
+  //       isLoaded.value = true
+  //     }, 300);
+  //   }
+  // })
+})
+onBeforeUnmount(() => {
+  video.value.pause()
+  video.value.currentTime = 0
+  video.value.src = ''
+})
 </script>
